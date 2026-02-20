@@ -19,10 +19,29 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-img {
+/* Scope img reset — exclude VTurb's internal elements */
+.sound-on img,
+.banner-img img,
+.products img,
+.scarcity-bar img,
+.comments-section img,
+.live-banner img {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+/* Let VTurb control its own elements */
+.video-wrapper * {
+  box-sizing: content-box;
+  margin: unset;
+  padding: unset;
+}
+
+.video-wrapper img {
+  display: unset;
+  max-width: unset;
+  height: unset;
 }
 
 a {
