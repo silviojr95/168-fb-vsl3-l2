@@ -19,6 +19,18 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- UTMify Pixel -->
+  <script>
+    window.pixelId = "679a6f7218d06913bdbd3506";
+    var a = document.createElement("script");
+    a.setAttribute("async", "");
+    a.setAttribute("defer", "");
+    a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+    document.head.appendChild(a);
+  </script>
+
+  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-subids async defer></script>
 </head>
 
 <body>
@@ -245,11 +257,75 @@
   <div id="snackbar" class="snackbar"></div>
 
   <!-- ===== TRACKING (async, non-blocking) ===== -->
-  <script src="https://uk.jellydailyblend.com/track.js?rtkcmpid=693ad2e6ea096666615e6164" async defer
-    onerror="console.warn('[RTK] Tracking script failed to load')"></script>
+  <script type="text/javascript"
+    src="https://uk.jellydailyblend.com/track.js?rtkcmpid=693ad2e6ea096666615e6164"></script>
 
   <!-- ===== APP JS ===== -->
   <script src="js/app.js" defer></script>
+
+  <!-- ===== FOOTER SCRIPTS ===== -->
+  <script>
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const clickId = params.get('clickid')
+        || (document.cookie.match('(?:^|; )rtkclickid-store=([^;]*)') || [])[1];
+
+      if (clickId) {
+        const img = new Image(1, 1);
+        img.src = `https://skgp6.ttrk.io/postback?format=img&clickid=${encodeURIComponent(clickId)}&sum=0&type=pageview`;
+        document.body.appendChild(img);
+        console.log('pageview pixel fired with clickid:', clickId);
+      } else {
+        console.warn('clickid não encontrado na URL nem no cookie.');
+      }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var urlParams = new URLSearchParams(window.location.search);
+      var clickid = urlParams.get('clickid');
+      if (!clickid) return;
+
+      window.addEventListener('DOMContentLoaded', function () {
+        var elements = document.querySelectorAll('a, button');
+        elements.forEach(function (el) {
+          var isLink = el.tagName.toLowerCase() === 'a';
+          var attrName = isLink ? 'href' : 'data-href';
+          var currentHref = el.getAttribute(attrName);
+
+          if (
+            !currentHref ||
+            currentHref.indexOf('clickid=') !== -1 ||
+            currentHref.indexOf('cid=') !== -1 ||
+            currentHref.indexOf('click_id=') !== -1 ||
+            currentHref.indexOf('campaignkey=') !== -1
+          ) {
+            return;
+          }
+
+          var hasQuery = currentHref.indexOf('?') !== -1;
+          var anchorIndex = currentHref.indexOf('#');
+          var anchor = '';
+
+          if (anchorIndex !== -1) {
+            anchor = currentHref.substring(anchorIndex);
+            currentHref = currentHref.substring(0, anchorIndex);
+          }
+
+          var newHref = currentHref
+            + (hasQuery ? '&' : '?')
+            + 'clickid=' + clickid
+            + '&cid=' + clickid
+            + '&click_id=' + clickid
+            + '&campaignkey=' + clickid
+            + anchor;
+
+          el.setAttribute(attrName, newHref);
+        });
+      });
+    })();
+  </script>
 
 </body>
 
