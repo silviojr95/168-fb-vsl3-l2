@@ -3,12 +3,12 @@
 /* ===== LIVE BANNER: dynamic viewer count + date ===== */
 (function initBanner() {
     try {
-        const countEl = document.getElementById('viewer-count');
-        const dateEl = document.getElementById('live-date');
-        if (countEl) countEl.textContent = Math.floor(Math.random() * 13) + 22; // 22–34
+        var countEl = document.getElementById('viewer-count');
+        var dateEl = document.getElementById('live-date');
+        if (countEl) countEl.textContent = Math.floor(Math.random() * 13) + 22;
         if (dateEl) {
-            const d = new Date();
-            const months = ['January', 'February', 'March', 'April', 'May', 'June',
+            var d = new Date();
+            var months = ['January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December'];
             dateEl.textContent = months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
         }
@@ -18,16 +18,18 @@
 /* ===== SCARCITY: random bottles left ===== */
 (function initScarcity() {
     try {
-        const el = document.getElementById('bottles-left');
-        if (el) el.textContent = Math.floor(Math.random() * 13) + 22; // 22–34
+        var el = document.getElementById('bottles-left');
+        if (el) el.textContent = Math.floor(Math.random() * 13) + 22;
     } catch (e) { console.warn('[Scarcity]', e); }
 })();
 
-/* ===== NOTIFICATIONS + PITCH REVEAL — triggered by VTurb pitch message ===== */
-(function initPitchListeners() {
+/* ===== PURCHASE NOTIFICATIONS ===== */
+/* Started ONLY when VTurb calls scrollIntoView() on the pitch section.
+   VTurb v4 calls element.scrollIntoView() on .smartplayer-scroll-event
+   at the pitch moment — we hijack that call to know the exact timing. */
+(function initNotifications() {
     try {
-        /* --- Notifications --- */
-        var notifStarted = false;
+        var started = false;
         var names = ["Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica",
             "Sarah", "Karen", "Lisa", "Nancy", "Betty", "Margaret", "Sandra", "Ashley", "Kimberly",
             "Emily", "Donna", "Michelle", "Carol", "Amanda", "Dorothy", "Melissa", "Deborah",
@@ -54,40 +56,36 @@
         }
 
         function startNotifications() {
-            if (notifStarted) return;
-            notifStarted = true;
+            if (started) return;
+            started = true;
             setTimeout(showNotif, 3000);
             setInterval(showNotif, 12000);
         }
 
-        /* --- VTurb pitch event listener (primary trigger) ---
-           VTurb v4 sends a postMessage when it scrolls to the pitch section.
-           We use this same event to start notifications. */
+        /* PRIMARY: intercept scrollIntoView() on the pitch element.
+           VTurb calls this method to scroll the page to the pitch section. */
+        var pitchEl = document.getElementById('pitch-section');
+        if (pitchEl) {
+            var nativeScrollIntoView = pitchEl.scrollIntoView.bind(pitchEl);
+            pitchEl.scrollIntoView = function (opts) {
+                startNotifications();           // trigger notifications on pitch
+                nativeScrollIntoView(opts);     // still perform the scroll
+            };
+        }
+
+        /* FALLBACK: VTurb postMessage (works in some player versions) */
         window.addEventListener('message', function (e) {
             try {
                 var d = e.data;
                 if (!d) return;
-                // VTurb scroll event formats
-                var isScrollEvent =
-                    (typeof d === 'string' && (d.indexOf('scrollEvent') !== -1 || d.indexOf('smartplayer') !== -1)) ||
-                    (typeof d === 'object' && (d.type === 'scrollEvent' || d.eventType === 'scrollEvent'));
-                if (isScrollEvent) {
+                if (
+                    (typeof d === 'string' && (d.indexOf('scrollEvent') !== -1 || d.indexOf('scroll_event') !== -1)) ||
+                    (typeof d === 'object' && (d.type === 'scrollEvent' || d.eventType === 'scrollEvent' || d.event === 'scrollEvent'))
+                ) {
                     startNotifications();
                 }
-            } catch (err) { /* ignore cross-origin errors */ }
+            } catch (err) { /* ignore cross-origin */ }
         });
 
-        /* --- Fallback: also observe VTurb attribute changes on pitch element ---
-           VTurb may toggle classes without postMessage in some configs */
-        var pitchEl = document.getElementById('pitch-section');
-        if (pitchEl) {
-            var attrObserver = new MutationObserver(function () { startNotifications(); });
-            attrObserver.observe(pitchEl, { attributes: true, attributeFilter: ['class', 'style'] });
-        }
-
-        /* --- Hard fallback: if VTurb never fires, start after 5 min ---
-           (prevents notifications never showing if VTurb event format changes) */
-        setTimeout(startNotifications, 300000);
-
-    } catch (e) { console.warn('[PitchListeners]', e); }
+    } catch (e) { console.warn('[Notifications]', e); }
 })();
