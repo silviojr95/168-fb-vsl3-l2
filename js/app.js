@@ -24,9 +24,9 @@
 })();
 
 /* ===== PURCHASE NOTIFICATIONS ===== */
-/* Started ONLY when VTurb calls scrollIntoView() on the pitch section.
-   VTurb v4 calls element.scrollIntoView() on .smartplayer-scroll-event
-   at the pitch moment — we hijack that call to know the exact timing. */
+/* Triggered when VTurb scrolls to the pitch section.
+   We intercept Element.prototype.scrollIntoView globally so that
+   no matter how VTurb queries the DOM, we catch the call. */
 (function initNotifications() {
     try {
         var started = false;
@@ -58,33 +58,36 @@
         function startNotifications() {
             if (started) return;
             started = true;
+            console.log('[Notifications] Pitch detected — starting notifications');
             setTimeout(showNotif, 3000);
             setInterval(showNotif, 12000);
         }
 
-        /* PRIMARY: intercept scrollIntoView() on the pitch element.
-           VTurb calls this method to scroll the page to the pitch section. */
-        var pitchEl = document.getElementById('pitch-section');
-        if (pitchEl) {
-            var nativeScrollIntoView = pitchEl.scrollIntoView.bind(pitchEl);
-            pitchEl.scrollIntoView = function (opts) {
-                startNotifications();           // trigger notifications on pitch
-                nativeScrollIntoView(opts);     // still perform the scroll
-            };
-        }
+        /* ------ PRIMARY: intercept scrollIntoView at prototype level ------
+           VTurb calls scrollIntoView() on .smartplayer-scroll-event elements.
+           We patch the prototype so ANY call on a matching element triggers us. */
+        var nativeScrollIntoView = Element.prototype.scrollIntoView;
+        Element.prototype.scrollIntoView = function () {
+            // Check if target is our pitch section or inside it
+            if (this.classList && this.classList.contains('smartplayer-scroll-event')) {
+                startNotifications();
+            }
+            // Always call the original
+            return nativeScrollIntoView.apply(this, arguments);
+        };
 
-        /* FALLBACK: VTurb postMessage (works in some player versions) */
+        /* ------ FALLBACK: postMessage from VTurb ------ */
         window.addEventListener('message', function (e) {
             try {
                 var d = e.data;
                 if (!d) return;
                 if (
-                    (typeof d === 'string' && (d.indexOf('scrollEvent') !== -1 || d.indexOf('scroll_event') !== -1)) ||
-                    (typeof d === 'object' && (d.type === 'scrollEvent' || d.eventType === 'scrollEvent' || d.event === 'scrollEvent'))
+                    (typeof d === 'string' && d.indexOf('scrollEvent') !== -1) ||
+                    (typeof d === 'object' && d.type === 'scrollEvent')
                 ) {
                     startNotifications();
                 }
-            } catch (err) { /* ignore cross-origin */ }
+            } catch (err) { /* ignore */ }
         });
 
     } catch (e) { console.warn('[Notifications]', e); }

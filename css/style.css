@@ -135,13 +135,17 @@ a {
 /* ===== BANNER IMAGE (newspaper logos) ===== */
 .banner-img {
   text-align: center;
-  padding: 20px 0;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, .10);
+  margin: 0 0 4px;
 }
 
 .banner-img img {
   margin: 0 auto;
   width: 100%;
-  max-width: 560px;
+  max-width: 520px;
   height: auto;
   display: block;
 }
