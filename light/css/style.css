@@ -132,6 +132,11 @@ a {
   opacity: 1;
 }
 
+/* Hide pitch section until VTurb reveals it (prevents FOUC) */
+#pitch-section {
+  display: none;
+}
+
 /* ===== BANNER IMAGE (newspaper logos) ===== */
 .banner-img {
   text-align: center;
