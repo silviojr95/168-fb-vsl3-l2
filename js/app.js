@@ -22,7 +22,7 @@
     } catch (e) { console.warn('[Scarcity]', e); }
 })();
 
-/* ===== PURCHASE NOTIFICATIONS ===== */
+/* ===== PURCHASE NOTIFICATIONS (only after pitch section visible) ===== */
 (function initNotifications() {
     try {
         const names = ["Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen", "Lisa", "Nancy", "Betty", "Margaret", "Sandra", "Ashley", "Kimberly", "Emily", "Donna", "Michelle", "Carol", "Amanda", "Dorothy", "Melissa", "Deborah", "Stephanie", "Rebecca", "Sharon", "Laura", "Cynthia", "Kathleen", "Amy", "Angela", "Shirley", "Anna", "Brenda", "Pamela", "Emma", "Nicole", "Helen", "Samantha", "Christine", "Debra", "Rachel", "Carolyn", "Janet", "Catherine", "Maria", "Heather", "Diane", "Ruth", "Julie", "Olivia", "Joyce", "Virginia", "Victoria", "Kelly", "Lauren", "Christina", "Joan", "Evelyn", "Judith", "Megan", "Andrea", "Cheryl", "Hannah", "Jacqueline", "Martha", "Gloria", "Teresa", "Ann", "Sara", "Madison", "Jean", "Kathryn", "Janice", "Abigail", "Alice", "Julia", "Judy", "Sophia", "Grace", "Denise", "Amber", "Doris", "Marilyn", "Danielle", "Beverly", "Isabella", "Theresa", "Diana", "Natalie", "Brittany", "Charlotte", "Marie", "Kayla", "Alexis", "Lori"];
@@ -38,8 +38,25 @@
             setTimeout(function () { snackbar.classList.remove('show'); }, 4000);
         }
 
-        setTimeout(show, 5000);
-        setInterval(show, 12000);
+        function startNotifications() {
+            setTimeout(show, 5000);
+            setInterval(show, 12000);
+        }
+
+        // Wait until pitch section is visible before starting notifications
+        var pitch = document.getElementById('pitch-section');
+        if (pitch && 'IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function (entries) {
+                if (entries[0].isIntersecting) {
+                    startNotifications();
+                    observer.disconnect();
+                }
+            }, { threshold: 0.2 });
+            observer.observe(pitch);
+        } else {
+            // Fallback: start after 60s (no IntersectionObserver support)
+            setTimeout(startNotifications, 60000);
+        }
     } catch (e) { console.warn('[Notifications]', e); }
 })();
 
