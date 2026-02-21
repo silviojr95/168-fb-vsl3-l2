@@ -1,0 +1,105 @@
+/* ===== LIGHT THEME OVERRIDE ===== */
+/* Imports the dark base, then overrides all dark colours */
+@import './style.css';
+
+/* ── GLOBAL ───────────────────────────────────── */
+body {
+    background: #f5f5f0;
+    color: #1a1a1a;
+}
+
+a {
+    color: inherit;
+}
+
+/* ── LIVE BANNER stays red ────────────────────── */
+
+/* ── SOUND ON ─────────────────────────────────── */
+.sound-on {
+    color: #444;
+}
+
+/* ── SCARCITY BAR stays red ───────────────────── */
+
+/* ── PRODUCT CARDS ────────────────────────────── */
+.product-card {
+    background: #ffffff;
+    border-color: #dde1e7;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, .08);
+}
+
+.product-card:hover {
+    box-shadow: 0 8px 32px rgba(216, 54, 68, .12);
+}
+
+.product-card.featured {
+    border-color: #D83644;
+    box-shadow: 0 4px 24px rgba(216, 54, 68, .18);
+}
+
+/* Badge stays red / blue as-is */
+
+.product-supply {
+    color: #777;
+}
+
+.product-price-label {
+    color: #888;
+}
+
+.product-qty {
+    color: #1a1a1a;
+}
+
+.product-price .currency,
+.product-price .amount {
+    color: #1a1a1a;
+}
+
+.product-perks li {
+    color: #1a1a1a;
+}
+
+.product-perks .check {
+    color: #2e7d32;
+}
+
+.product-total {
+    color: #555;
+}
+
+.product-total s {
+    color: #aaa;
+}
+
+.product-total strong {
+    color: #1a1a1a;
+}
+
+.product-total .shipping {
+    color: #c0392b;
+}
+
+.product-total .free-shipping {
+    color: #2e7d32;
+}
+
+/* BUY NOW button stays green */
+
+/* ── COMMENTS ─────────────────────────────────── */
+/* Comments section already has white bg - just darken the container border */
+.comments-section {
+    background: #fff;
+    border: 1px solid #dde1e7;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+}
+
+/* ── SNACKBAR already white ───────────────────── */
+
+/* ── VIDEO & BANNER bg ────────────────────────── */
+.video-wrapper {
+    background: #000;
+}
+
+/* ── RESPONSIVE overrides for light theme ─────── */
+/* (inherit from style.css — no changes needed) */
