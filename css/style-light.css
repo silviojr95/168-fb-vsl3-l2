@@ -1,5 +1,4 @@
 /* ===== LIGHT THEME OVERRIDE ===== */
-/* Imports the dark base, then overrides all dark colours */
 @import './style.css';
 
 /* ── GLOBAL ───────────────────────────────────── */
@@ -12,14 +11,53 @@ a {
     color: inherit;
 }
 
-/* ── LIVE BANNER stays red ────────────────────── */
-
 /* ── SOUND ON ─────────────────────────────────── */
 .sound-on {
     color: #444;
 }
 
-/* ── SCARCITY BAR stays red ───────────────────── */
+/* ── (1) LIVE BANNER → dark charcoal instead of harsh red ── */
+.live-banner {
+    background: linear-gradient(90deg, #1a1a2e, #16213e);
+    color: #fff;
+}
+
+.live-dot {
+    background: #e74c3c;
+}
+
+/* ── (2) NEWSPAPER LOGOS → pure white card ───── */
+.banner-img {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, .10);
+    margin: 0 0 4px;
+}
+
+.banner-img img {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    display: block;
+}
+
+/* ── (3) SCARCITY BAR → softer warm tone ─────── */
+.scarcity-bar {
+    background: linear-gradient(90deg, #b71c2a, #8b0000);
+    font-size: 17px;
+}
+
+/* ── (4) PRODUCT BADGES → less saturated ─────── */
+.product-badge {
+    background: linear-gradient(90deg, #b71c2a, #c0392b);
+    letter-spacing: .5px;
+}
+
+.product-badge.best-value {
+    background: linear-gradient(90deg, #1565C0, #1976D2);
+}
 
 /* ── PRODUCT CARDS ────────────────────────────── */
 .product-card {
@@ -29,15 +67,13 @@ a {
 }
 
 .product-card:hover {
-    box-shadow: 0 8px 32px rgba(216, 54, 68, .12);
+    box-shadow: 0 8px 32px rgba(183, 28, 42, .12);
 }
 
 .product-card.featured {
-    border-color: #D83644;
-    box-shadow: 0 4px 24px rgba(216, 54, 68, .18);
+    border-color: #b71c2a;
+    box-shadow: 0 4px 24px rgba(183, 28, 42, .18);
 }
-
-/* Badge stays red / blue as-is */
 
 .product-supply {
     color: #777;
@@ -84,22 +120,14 @@ a {
     color: #2e7d32;
 }
 
-/* BUY NOW button stays green */
-
 /* ── COMMENTS ─────────────────────────────────── */
-/* Comments section already has white bg - just darken the container border */
 .comments-section {
     background: #fff;
     border: 1px solid #dde1e7;
     box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
 }
 
-/* ── SNACKBAR already white ───────────────────── */
-
-/* ── VIDEO & BANNER bg ────────────────────────── */
+/* ── VIDEO ────────────────────────────────────── */
 .video-wrapper {
     background: #000;
 }
-
-/* ── RESPONSIVE overrides for light theme ─────── */
-/* (inherit from style.css — no changes needed) */
