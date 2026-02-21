@@ -46,17 +46,20 @@ a {
 /* ── (3) SCARCITY BAR → softer warm tone ─────── */
 .scarcity-bar {
     background: linear-gradient(90deg, #b71c2a, #8b0000);
+    color: #fff;
     font-size: 17px;
 }
 
 /* ── (4) PRODUCT BADGES → less saturated ─────── */
 .product-badge {
     background: linear-gradient(90deg, #b71c2a, #c0392b);
+    color: #fff;
     letter-spacing: .5px;
 }
 
 .product-badge.best-value {
     background: linear-gradient(90deg, #1565C0, #1976D2);
+    color: #fff;
 }
 
 /* ── PRODUCT CARDS ────────────────────────────── */
