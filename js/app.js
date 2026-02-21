@@ -24,9 +24,9 @@
 })();
 
 /* ===== PURCHASE NOTIFICATIONS ===== */
-/* Triggered when VTurb scrolls to the pitch section.
-   We intercept Element.prototype.scrollIntoView globally so that
-   no matter how VTurb queries the DOM, we catch the call. */
+/* Multi-signal detection: we try every method to detect VTurb's pitch moment.
+   The flag `started` ensures notifications only fire once regardless of which
+   signal triggers first. */
 (function initNotifications() {
     try {
         var started = false;
@@ -58,25 +58,62 @@
         function startNotifications() {
             if (started) return;
             started = true;
-            console.log('[Notifications] Pitch detected — starting notifications');
             setTimeout(showNotif, 3000);
             setInterval(showNotif, 12000);
         }
 
-        /* ------ PRIMARY: intercept scrollIntoView at prototype level ------
-           VTurb calls scrollIntoView() on .smartplayer-scroll-event elements.
-           We patch the prototype so ANY call on a matching element triggers us. */
+        var pitchEl = document.querySelector('#pitch-section');
+        if (!pitchEl) return;
+
+        /* ------ METHOD 1: MutationObserver on pitch element ------
+           VTurb may set inline style "display:none" and then remove it,
+           or change classes at the pitch moment. */
+        var styleObs = new MutationObserver(function (mutations) {
+            mutations.forEach(function (m) {
+                if (m.attributeName === 'style') {
+                    var display = window.getComputedStyle(pitchEl).display;
+                    if (display !== 'none') {
+                        startNotifications();
+                    }
+                }
+                if (m.attributeName === 'class') {
+                    startNotifications();
+                }
+            });
+        });
+        styleObs.observe(pitchEl, { attributes: true, attributeFilter: ['style', 'class'] });
+
+        /* ------ METHOD 2: Intercept scrollIntoView at prototype level ------ */
         var nativeScrollIntoView = Element.prototype.scrollIntoView;
         Element.prototype.scrollIntoView = function () {
-            // Check if target is our pitch section or inside it
             if (this.classList && this.classList.contains('smartplayer-scroll-event')) {
                 startNotifications();
             }
-            // Always call the original
             return nativeScrollIntoView.apply(this, arguments);
         };
 
-        /* ------ FALLBACK: postMessage from VTurb ------ */
+        /* ------ METHOD 3: Intercept window.scrollTo / window.scroll ------
+           VTurb might use window.scrollTo instead of scrollIntoView. 
+           We check if the scroll target is near the pitch element. */
+        var nativeScrollTo = window.scrollTo;
+        window.scrollTo = function () {
+            nativeScrollTo.apply(window, arguments);
+            // After scrolling, check if pitch section is now in viewport
+            var rect = pitchEl.getBoundingClientRect();
+            if (rect.top >= -200 && rect.top <= window.innerHeight) {
+                startNotifications();
+            }
+        };
+        var nativeScroll = window.scroll;
+        window.scroll = function () {
+            nativeScroll.apply(window, arguments);
+            var rect = pitchEl.getBoundingClientRect();
+            if (rect.top >= -200 && rect.top <= window.innerHeight) {
+                startNotifications();
+            }
+        };
+
+        /* ------ METHOD 4: postMessage fallback ------ */
         window.addEventListener('message', function (e) {
             try {
                 var d = e.data;
@@ -89,6 +126,26 @@
                 }
             } catch (err) { /* ignore */ }
         });
+
+        /* ------ METHOD 5: Visibility polling (ultimate fallback) ------
+           Poll every 2s — if pitch element was hidden and is now visible,
+           that's the pitch moment. Stops polling once triggered. */
+        var wasHidden = true;
+        var pollId = setInterval(function () {
+            if (started) { clearInterval(pollId); return; }
+            var cs = window.getComputedStyle(pitchEl);
+            var isHidden = (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0');
+            if (wasHidden && !isHidden) {
+                // Was hidden, now visible — pitch happened
+                // But only trigger if it was actually hidden before (not just on load)
+            }
+            wasHidden = isHidden;
+            // If element becomes visible AND page has scrolled past video section
+            if (!isHidden && window.scrollY > 400) {
+                startNotifications();
+                clearInterval(pollId);
+            }
+        }, 2000);
 
     } catch (e) { console.warn('[Notifications]', e); }
 })();
